@@ -1,5 +1,6 @@
 package edu.miu.eshop.product.api.Controller;
 
+import edu.miu.eshop.product.dto.SearchDto;
 import edu.miu.eshop.product.entity.Product;
 import edu.miu.eshop.product.entity.SearchHistory;
 import edu.miu.eshop.product.entity.Order;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/search")
@@ -24,19 +27,18 @@ public class SearchController {
     private HttpServletRequest request;
 
     private String remoteIPAddress;
-
     private SearchHistory searchHistory;
     private Double maxPrice = Double.MAX_VALUE;
 
     @PostMapping("")
-    public ArrayList<Product> search(@RequestParam("productName") String productName, @RequestParam("productCategory") String productCategory,
-                                     @RequestParam("manufacturer") String manufacturer, @RequestParam("minProductPrice") Double minProductPrice,
-                                     @RequestParam("maxProductPrice") Double maxProductPrice, @RequestBody String customerId){
+    public List<Product> search(@RequestParam("productName") String productName, @RequestParam("productCategory") String productCategory,
+                                @RequestParam("manufacturer") String manufacturer, @RequestParam("minProductPrice") Double minProductPrice,
+                                @RequestParam("maxProductPrice") Double maxProductPrice, @RequestBody SearchDto searchDto){
             /**
              * Save search history
              */
             searchHistory = new SearchHistory();
-            searchHistory.setCustomerId(customerId);
+            searchHistory.setUserName(searchDto.getUserName());
             saveHistory(productName);
 
             /**
@@ -64,9 +66,7 @@ public class SearchController {
             searchHistory.setSearchWord(searchWord);
             searchHistory.setCustomerIP(remoteIPAddress);
             searchHistory.setSearchDate(LocalDateTime.now());
-
             searchService.saveSearchHistory(searchHistory);
-            //connect to user microservice and save it
         }
     }
 }

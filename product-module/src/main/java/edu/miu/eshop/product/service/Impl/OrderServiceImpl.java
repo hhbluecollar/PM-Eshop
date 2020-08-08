@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,23 +28,21 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
     private ProductRepository productRepository;
     @Autowired
     private PromotionRepository promotionRepository;
 
     private  double promotion;
 
-    public void createOrder(ShoppingCart cart, Customer customer) {
-
+    public void createOrder(ShoppingCart cart, String userName) {
+        System.out.println(cart);
         cart.getCartItems().forEach(
                 cartItem -> {
                     Order order = new Order();
                     double totalCost = calculateCost(cartItem);
                     order.setTotalCost(totalCost);
-                    order.setOrderDate(LocalDate.now());
-                    order.setOrderedBy(customer);
+                    order.setOrderDate(LocalDateTime.now());
+                    order.setUserName(userName);
                     order.setOrderNumber(generateOrderNumber());
                     orderRepository.save(order);
                 }
@@ -57,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
                     Order order = new Order();
                    // double totalCost = calculateCost(cartItem);
                     //order.setTotalCost(totalCost);
-                    order.setOrderDate(LocalDate.now());
+                    order.setOrderDate(LocalDateTime.now());
                  //   order.setOrderedBy(customer);
                     order.setOrderNumber(generateOrderNumber());
                     orderRepository.save(order);
@@ -71,8 +70,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllOrders(Customer customer) {
-        return orderRepository.findAllByOrderedBy (customer);
+    public List<Order> getAllOrders(String userName) {
+        return orderRepository.findAllByUserName (userName);
     }
 
 
@@ -104,11 +103,6 @@ public class OrderServiceImpl implements OrderService {
                 }
 
         return item.getQuantity()*(item.getUnitCost()-promotion)* TaxRate.TAX_RATE.getStateTax();
-    }
-
-    @Override
-    public Order checkStock(Order order) {
-        return null;
     }
 
     //generate order number of length 15

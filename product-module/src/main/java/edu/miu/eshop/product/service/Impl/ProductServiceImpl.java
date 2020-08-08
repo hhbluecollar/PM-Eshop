@@ -1,10 +1,10 @@
 package edu.miu.eshop.product.service.Impl;
 
+import edu.miu.eshop.product.constants.ProductStatus;
 import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.entity.Category;
 import edu.miu.eshop.product.entity.Product;
 import edu.miu.eshop.product.entity.Promotion;
-import edu.miu.eshop.product.entity.Status;
 import edu.miu.eshop.product.repository.ProductRepository;
 import edu.miu.eshop.product.repository.PromotionRepository;
 import edu.miu.eshop.product.service.ProductService;
@@ -109,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateStatus(String id, Status newStatus) {
+    public void updateStatus(String id, ProductStatus newStatus) {
         Product product =  productRepository.findByProductId(id);
         product.setStatus(newStatus);
         productRepository.save(product);

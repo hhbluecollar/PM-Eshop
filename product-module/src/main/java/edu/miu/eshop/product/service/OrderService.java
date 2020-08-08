@@ -8,13 +8,12 @@ import edu.miu.eshop.product.entity.ShoppingCart;
 import java.util.List;
 
 public interface OrderService {
-    void createOrder(ShoppingCart cart, Customer customer);
+    void createOrder(ShoppingCart cart, String userName);
     void createGuestOrder(List<OrderItem> items);
-    Order checkStock(Order order);
 
     Order getOrder(String orderNumber);
 
-    List<Order> getAllOrders(Customer customer);
+    List<Order> getAllOrders(String userName);
 
     void updateOrder(Order oldOrder);
 

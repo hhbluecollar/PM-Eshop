@@ -1,5 +1,6 @@
 package edu.miu.eshop.product.entity;
 
+import edu.miu.eshop.product.constants.ProductStatus;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -30,7 +31,7 @@ public class Product {
     @DBRef
     private Category productCategory;
     private List<ProductImage> imageList;
-    private Status status ;
+    private ProductStatus status ;
 
     public void addProductDetail( String specName, String specValue, String specType) {
         ProductDetail detail = new ProductDetail( specName,  specValue);

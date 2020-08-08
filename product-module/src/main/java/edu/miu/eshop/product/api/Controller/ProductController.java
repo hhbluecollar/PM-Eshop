@@ -1,8 +1,8 @@
 package edu.miu.eshop.product.api.Controller;
 
+import edu.miu.eshop.product.constants.ProductStatus;
 import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.entity.Product;
-import edu.miu.eshop.product.entity.Status;
 import edu.miu.eshop.product.service.ProductService;
 import edu.miu.eshop.product.service.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class ProductController {
                 .body( productService.getProductsOnPromotion());
     }
     @PutMapping("/{id}/{newstatus}")
-    public ResponseEntity updateStatus(@PathVariable String id, @PathVariable Status newStatus){
+    public ResponseEntity updateStatus(@PathVariable String id, @PathVariable ProductStatus newStatus){
         productService.updateStatus(id, newStatus);
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -9,6 +9,7 @@ import edu.miu.eshop.product.entity.ShoppingCart;
 import edu.miu.eshop.product.service.OrderService;
 import edu.miu.eshop.product.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,9 @@ import javax.validation.Valid;
 import java.util.List;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/orders")
 public class OrderController {
 
-    @Autowired
-    private CustomerRepository customerRepository;
     @Autowired
     private OrderService orderService;
     @Autowired
@@ -29,33 +28,39 @@ public class OrderController {
 
     // ORDER CREATE
     @GetMapping("create/{userName}")
-    public ResponseEntity<?> createOrder(@PathVariable String userName){
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        ShoppingCart cart = customer.getCart();
-        orderService.createOrder(cart, customer);
-        return ResponseEntity.ok().body("Order created successfully.");
+    public ResponseEntity createOrder(@PathVariable String userName){
+        ShoppingCart cart = shoppingCartService.findCartForUser(userName);
+        if(cart==null )  {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("The user has no order");
+        }
+        orderService.createOrder(cart, userName);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Order created");
     }
 
     //READ
-    @GetMapping("getAll/{userName}")
-    public List<Order> getAllOrders(@PathVariable String userName){
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        System.out.println(customer);
-        return orderService.getAllOrders(customer);
+    @GetMapping("/{userName}")
+    public ResponseEntity getAllOrders(@PathVariable String userName){
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body( orderService.getAllOrders(userName));
     }
 
-    @GetMapping("get/{orderNumber}")
+    @GetMapping("order/{orderNumber}")
     public Order getOrder(@PathVariable("orderNumber") String orderNumber){
         return orderService.getOrder(orderNumber);
     }
 
     //CHECKOUT and CONFIRM PAYMENT
-    @PostMapping("/checkout/{userName}")
-    public ResponseEntity<?> checkout(@PathVariable("userName") String userName, @RequestBody @Valid PaymentCard paymentCard){
+    @PostMapping("/checkout/{id}")
+    public ResponseEntity<?> checkout(@PathVariable("id") String id, @RequestBody PaymentCard paymentCard){
 
         //FIND ALL PENDING ORDERS FOR THE CUSTOMER
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        List<Order> orders = orderService.getAllOrders(customer);
+        Order order = orderService.getOrder(id);
+       // List<Order> orders = orderService.getAllOrders(customer);
         //confirm payment
         /*
         if(CardValidator.isValidCard(paymentCard.getCardNumber())==false)
@@ -64,7 +69,7 @@ public class OrderController {
 
             CALL PAYMENT MODULE
              */
-            //  PaymentModule(customer, orderNumber, paymentCard);
+             //PaymentModule(order.getUserName(), id, paymentCard);
 
             //save purchase history
     /*
@@ -112,7 +117,10 @@ public class OrderController {
         oldOrder.setTotalCost(newOrder.getTotalCost());
         oldOrder.setCartItem(newOrder.getCartItem());
         orderService.updateOrder(oldOrder);
-        return ResponseEntity.ok().body("Order updated successfully.");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Order updated.");
     }
 
     //DELETE ORDER
@@ -120,7 +128,9 @@ public class OrderController {
     public ResponseEntity<?> deleteOrder(@PathVariable("orderNumber") String orderNumber){
 
         orderService.deleteOrder(orderNumber);
-        return ResponseEntity.ok().body("Order deleted successfully.");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Order deleted successfully.");
     }
 
     //INVOICE GENERATION

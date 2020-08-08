@@ -10,13 +10,12 @@ import java.time.LocalDateTime;
 @ToString
 @Setter
 @Getter
-@AllArgsConstructor
 @Document
 public class SearchHistory {
 
     @Id
     private String id;
-    private String customerId;
+    private String userName;
     private String searchWord;
     private String customerIP;
     private LocalDateTime searchDate;

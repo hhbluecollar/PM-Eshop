@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -25,11 +26,10 @@ public class Order {
     @Indexed(unique=true) // make it unique username
     private String orderNumber;
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
     private double totalCost;
     private List<CartItem> cartItem; // use design pattern
-    @DBRef
-    private Customer orderedBy;
+    private String userName;
 
     /**
      *  USE DESIGN PATTERN TO INITIALIZE FIELDS
@@ -38,10 +38,10 @@ public class Order {
      * @param cartItem
      * @param orderedBy
      */
-    public Order(String orderNumber, LocalDate orderDate, List<CartItem> cartItem, Customer orderedBy) {
+    public Order(String orderNumber, LocalDateTime orderDate, List<CartItem> cartItem, String orderedBy) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
         this.cartItem = cartItem;
-        this.orderedBy = orderedBy;
+        this.userName = orderedBy;
     }
 }
