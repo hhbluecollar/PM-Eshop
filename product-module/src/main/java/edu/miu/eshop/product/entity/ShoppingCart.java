@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,21 +15,22 @@ import java.util.List;
 @ToString
 @Setter
 @Getter
+@Document
 public class ShoppingCart {
 
-    //private String id;
+    @Id
+    private String id;
     // OneToMany --- the one side owns the relationship
-    private List<CartItem> cartItems = new ArrayList<>();
+    private List<CartItem> cartItems ;
+    @Indexed(unique = true)
+    private String userName;
 
-   // private Customer owner;
-
+    public ShoppingCart(String userName){
+        this.userName = userName;
+        cartItems = new ArrayList<>();
+    }
     public void addItem( String productId, String name, double unitCost, int quantity) {
-
         CartItem item = new CartItem( productId,  name, unitCost, quantity);
         cartItems.add(item);
     }
-
-//    ShoppingCart(Customer cus) {
-//        this.owner = cus;
-//    }
 }

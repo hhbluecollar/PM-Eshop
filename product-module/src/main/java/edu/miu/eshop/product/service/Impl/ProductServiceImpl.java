@@ -4,6 +4,7 @@ import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.entity.Category;
 import edu.miu.eshop.product.entity.Product;
 import edu.miu.eshop.product.entity.Promotion;
+import edu.miu.eshop.product.entity.Status;
 import edu.miu.eshop.product.repository.ProductRepository;
 import edu.miu.eshop.product.repository.PromotionRepository;
 import edu.miu.eshop.product.service.ProductService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,14 +108,42 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void updateStatus(String id, Status newStatus) {
+        Product product =  productRepository.findByProductId(id);
+        product.setStatus(newStatus);
+        productRepository.save(product);
+    }
+
+    @Override
+    public void updateProduct(ProductDto productDto) {
+
+    }
+
     /**
      *TO DO
      */
     private ProductDto convertToProductDTO(Product product ) {
         modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.LOOSE);
-        ProductDto productDto = modelMapper
-                .map(product, ProductDto.class);
+                   .setMatchingStrategy(MatchingStrategies.LOOSE);
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
         return productDto;
+    }
+
+    private Product convertToEntity(ProductDto productDto) throws ParseException {
+        Product product = modelMapper.map(productDto, Product.class);
+
+        if (productDto.getProductId() != null) {
+            Product oldProduct = productRepository.findByProductId(productDto.getProductId());
+            product.setProductName(oldProduct.getProductName());
+            product.setDescription(oldProduct.getDescription());
+            product.setCurrentQuantity(oldProduct.getCurrentQuantity());
+            product.setProductDetails(oldProduct.getProductDetails());
+            product.setVendorId(oldProduct.getVendorId());
+            product.setProductCategory(oldProduct.getProductCategory());
+            product.setImageList(oldProduct.getImageList());
+        }
+        productRepository.save(product);
+        return product;
     }
 }

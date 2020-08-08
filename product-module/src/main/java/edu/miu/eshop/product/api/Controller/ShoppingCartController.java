@@ -1,25 +1,29 @@
 package edu.miu.eshop.product.api.Controller;
 
-import edu.miu.eshop.product.entity.CartItem;
-import edu.miu.eshop.product.entity.Customer;
-import edu.miu.eshop.product.entity.ShoppingCart;
+import edu.miu.eshop.product.dto.CartItemDto;
+import edu.miu.eshop.product.dto.ProductDto;
+import edu.miu.eshop.product.dto.ShoppingCartDto;
+import edu.miu.eshop.product.entity.*;
 import edu.miu.eshop.product.repository.CustomerRepository;
 import edu.miu.eshop.product.service.OrderService;
 import edu.miu.eshop.product.service.ProductService;
 import edu.miu.eshop.product.service.ShoppingCartService;
-import edu.miu.eshop.product.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.ws.rs.Path;
 import java.util.List;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/cart")
 public class ShoppingCartController {
 
     @Autowired
-    private ShoppingCartService cartService;
+    private ShoppingCartService shoppingCartService;
     @Autowired
     private OrderService orderService;
     @Autowired
@@ -29,65 +33,82 @@ public class ShoppingCartController {
     @Autowired
     private RestTemplate restTemplate;
 
-    //CREATE SHOPPING CART , ALERT!! NOT needed anymore for the current implementation
-    @PostMapping("create")
-    public void createCart(@RequestBody Customer customer){
-         cartService.createNewCart(customer);
+    @PostMapping("/create")
+    public ResponseEntity  createCart(@RequestBody CartItemDto cartItemDto){
+        if(shoppingCartService.findCartForUser(cartItemDto.getUserName())!=null){
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("Cart already created");
+        }
+        shoppingCartService.createNewCart(cartItemDto.getUserName());
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Cart created");
     }
 
     //ADD PRODUCT, ALSO UPDATES QUANTITY
-    @GetMapping("add/{productId}/{quantity}/{userName}")
-    public ShoppingCart addCartItem(@PathVariable String productId, @PathVariable int quantity, @PathVariable String userName){
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        ShoppingCart cart = customer.getCart();
-//        Product product = productService.getProduct(productId);
-//        if(product.isActive()&&product.isAvailable()== true && product.isActive()==true )
-//            cartService.addCartItem(customer,product,quantity);
-//        else if(product.getCurrentQuantity()-quantity>=0) System.out.println("Sorry, the requested amount is not available in stock.");
-        return cart;
+    @PostMapping("cartitem/add")
+    public ResponseEntity addCartItem(@RequestBody CartItemDto cartItemDto){
+        ShoppingCart cart = shoppingCartService.findCartForUser(cartItemDto.getUserName());
+        ProductDto product  = productService.getProduct(cartItemDto.getProductId());
+        boolean exists = cart.getCartItems().stream().anyMatch(i->i.getProductId().equals(cartItemDto.getProductId()));
+
+        if(product==null)  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+        if(cart!=null){
+
+                    shoppingCartService.addCartItem(product, cart, cartItemDto.getQuantity());
+        }else{
+           return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Cart not found");
+        }
+        return   ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(cart);
     }
 
     //READ
-    @GetMapping("get/{productId}/{userName}")
-    public CartItem getCartItem(@PathVariable("productId") String productId , @PathVariable String userName){
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        System.out.println(userName);
-        return customer.getCart().getCartItems().stream().filter(i->i.getProductId().equals(productId)).findFirst().orElse( null);
+    @GetMapping("/cartitem/{productid}/{userName}")
+    public ResponseEntity getCartItem(@PathVariable("productid") String productid , @PathVariable String userName){
+        ShoppingCart cart  = shoppingCartService.findCartForUser(userName);
+        if(cart==null) ResponseEntity.status(HttpStatus.NOT_FOUND). body("Cart not found");
+        //if(productService.getProduct(productid)==null) ResponseEntity.status(HttpStatus.NOT_FOUND). body("Product not found");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cart.getCartItems().stream().filter(i->i.getProductId().equals(productid)).findFirst().orElse( null));
     }
 
     //UPDATE PRODUCT QUANTITY
-    @PutMapping("update/{productId}/{updatedQuantity}/{userName}")
-    public ShoppingCart updateQuantity(@PathVariable("productId") String productId,@PathVariable int updatedQuantity, @PathVariable String userName){
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        cartService.setProductQuantity(customer, productId, updatedQuantity);
-        ShoppingCart cart = customer.getCart();
-        return  cart;
+    @PutMapping("cartitem/updatequantity/{productid}/{quantity}")
+    public ResponseEntity updateQuantity(@RequestBody ShoppingCartDto shoppingCartDto, @PathVariable String productid, @PathVariable int quantity){
+        ShoppingCart cart  = shoppingCartService.findCartForUser(shoppingCartDto.getUserName());
+        shoppingCartService.setProductQuantity(cart, productid, quantity);
+        return  ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cart);
     }
 
     //REMOVE PRODUCT
-    @DeleteMapping("delete/{productid}/{userName}")
-    public ShoppingCart removeItem(@PathVariable("productid") String productId, @PathVariable String userName){
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        cartService.removeItem(customer,productId);
-        ShoppingCart cart = customer.getCart();
-        return cart;
+    @DeleteMapping("/cartitem/delete")
+    public ResponseEntity removeItem(@RequestBody ShoppingCartDto shoppingCartDto){
+        ShoppingCart cart = shoppingCartService.findCartForUser(shoppingCartDto.getUserName());
+        shoppingCartService.removeItem(cart,shoppingCartDto.getCartItem().getProductId());
+        return  ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body("Item deleted");
     }
 
     //READ
-    @GetMapping("getAll/{userName}")
-    public List<CartItem> getCartItems(@PathVariable String userName){
-        Customer customer = customerRepository.findDistinctFirstByUserName(userName);
-        return customer.getCart().getCartItems();
-    }
-
-    /**
-     * For test to be deleted
-     */
-
-    @PostMapping("saveuser")
-    public Customer saveCustomer(@RequestBody Customer customer){
-
-        customerRepository.save(customer);
-        return customer;
+    @GetMapping("/{userName}")
+    public ResponseEntity getCartItems(@PathVariable String userName){
+        ShoppingCart cart = shoppingCartService.findCartForUser(userName);
+        if(cart==null)
+            return  ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Cart is empty");
+        return  ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(cart.getCartItems());
     }
 }

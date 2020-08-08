@@ -23,17 +23,14 @@ public class Product {
     private String productName;
     private double price;
     private String description;
-
     private String manufacturer;
     private  int currentQuantity;
     private ArrayList<ProductDetail> productDetails = new ArrayList<>();
     private String vendorId;
     @DBRef
     private Category productCategory;
-
     private List<ProductImage> imageList;
-    private boolean status ;
-
+    private Status status ;
 
     public void addProductDetail( String specName, String specValue, String specType) {
         ProductDetail detail = new ProductDetail( specName,  specValue);

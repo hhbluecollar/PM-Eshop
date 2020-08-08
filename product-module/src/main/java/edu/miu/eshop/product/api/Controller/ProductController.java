@@ -2,18 +2,15 @@ package edu.miu.eshop.product.api.Controller;
 
 import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.entity.Product;
-import edu.miu.eshop.product.service.CategoryService;
+import edu.miu.eshop.product.entity.Status;
 import edu.miu.eshop.product.service.ProductService;
 import edu.miu.eshop.product.service.PromotionService;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -44,19 +41,17 @@ public class ProductController {
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body( productService.getProductsByCategoryId(categoryid));
-
     }
 
     @GetMapping("/category/{categoryid}/{categoryName}")
     public ResponseEntity getProductByCategoryName(@PathVariable String categoryid, @PathVariable String categoryName){
-        //return ;
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body( productService.getProductsByCategoryName(categoryid,categoryName));
     }
 
     @GetMapping("")
-    public ResponseEntity getProduct(){
+    public ResponseEntity getProducts(){
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body( productService.getAll());
@@ -76,5 +71,19 @@ public class ProductController {
                 .status(HttpStatus.FOUND)
                 .body( productService.getProductsOnPromotion());
     }
+    @PutMapping("/{id}/{newstatus}")
+    public ResponseEntity updateStatus(@PathVariable String id, @PathVariable Status newStatus){
+        productService.updateStatus(id, newStatus);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body( "Status updated");
+    }
 
+    @PutMapping("/update")
+    public ResponseEntity updateProduct(@RequestBody ProductDto productDto){
+        productService.updateProduct(productDto);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body( " Product updated");
+    }
 }

@@ -7,6 +7,7 @@ import edu.miu.eshop.product.entity.PaymentCard;
 import edu.miu.eshop.product.entity.Customer;
 import edu.miu.eshop.product.entity.ShoppingCart;
 import edu.miu.eshop.product.service.OrderService;
+import edu.miu.eshop.product.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +15,17 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/order")
 public class OrderController {
 
     @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
     private OrderService orderService;
     @Autowired
-    private CustomerRepository customerRepository;
+    private ShoppingCartService shoppingCartService;
 
     // ORDER CREATE
     @GetMapping("create/{userName}")

@@ -5,13 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDto {
+public class CartItemDto {
+    private String productId;
+    private int quantity;
+    private String userName;
 
-    private String categoryId;
-    private String parentId;
-    private String value;
 }

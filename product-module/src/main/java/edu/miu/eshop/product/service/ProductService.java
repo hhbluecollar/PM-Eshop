@@ -3,6 +3,7 @@ package edu.miu.eshop.product.service;
 
 import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.entity.Product;
+import edu.miu.eshop.product.entity.Status;
 
 import java.util.List;
 
@@ -18,4 +19,8 @@ public interface ProductService {
     List<ProductDto> getProductsByVendorId(String vendorid);
 
     List<ProductDto> getProductsOnPromotion();
+
+    void updateStatus(String id, Status newStatus);
+
+    void updateProduct(ProductDto productDto);
 }

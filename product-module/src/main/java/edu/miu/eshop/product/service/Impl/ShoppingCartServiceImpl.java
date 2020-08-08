@@ -1,5 +1,6 @@
 package edu.miu.eshop.product.service.Impl;
 
+import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.repository.CustomerRepository;
 import edu.miu.eshop.product.repository.ShoppingCartRepository;
 import edu.miu.eshop.product.entity.Product;
@@ -26,36 +27,46 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
 
     @Override
-
-    public void createNewCart(Customer customer) {
-        customerRepository.save(customer);
-        ShoppingCart cart = CustShopCartFactory.createShoppingCart(customer);
+    public void createNewCart(String userName) {
+        ShoppingCart cart = new ShoppingCart(userName);
         shoppingCartRepository.save(cart);
     }
 
     @Override
-    public void addCartItem(Customer customer, Product product, int quantity) {
-         List<CartItem>  cartItems =  customer.getCart().getCartItems();
+    public ShoppingCart findCartForUser(String userName) {
+        return shoppingCartRepository.findByUserName(userName);
+    }
+
+    @Override
+    public ShoppingCart findCartItem(String productid) {
+        return shoppingCartRepository.findByCartItems_ProductId(productid);
+    }
+
+    @Override
+    public void addCartItem(ProductDto product,  ShoppingCart cart, int quantity) {
+         List<CartItem>  cartItems =  cart.getCartItems();
          boolean exists = cartItems.stream().anyMatch(i->i.getProductId().equals(product.getProductId()));
         if(exists) {
-            customer.getCart().getCartItems().stream().filter(i->i.getProductId().equals(product.getProductId())).forEach(i->{
-                                                                                                                    i.setQuantity(i.getQuantity()+quantity);
-                                                                                                                    });
+            cart.getCartItems().stream().filter(i->i.getProductId().equals(product.getProductId()))
+                                        .forEach(i->{
+                                                              i.setQuantity(i.getQuantity()+quantity);  });
         }else
-            customer.getCart().addItem(product.getProductId(), product.getProductName(), product.getPrice(), quantity);
-        customerRepository.save(customer);
+            cart.addItem(product.getProductId(), product.getProductName(), product.getPrice(), quantity);
+        shoppingCartRepository.save(cart);
     }
 
     @Override
-    public void removeItem(Customer customer, String productId) {
-        customer.getCart().getCartItems().removeIf(i->i.getProductId().equals(productId));
-        customerRepository.save(customer);
+    public void setProductQuantity(ShoppingCart cart, String productId, int updatedQuantity) {
+        System.out.println(cart);
+        cart.getCartItems().stream().filter(i->i.getProductId().equals(productId))
+                                    .forEach(i->i.setQuantity(updatedQuantity));
+        shoppingCartRepository.save(cart);
     }
 
     @Override
-    public void setProductQuantity(Customer customer, String productId, int updatedQuantity) {
-        customer.getCart().getCartItems().stream().filter(i->i.getProductId().equals(productId)).forEach(i->i.setQuantity(updatedQuantity));
-        customerRepository.save(customer);
+    public void removeItem(ShoppingCart cart, String productId) {
+        cart.getCartItems().removeIf(i->i.getProductId().equals(productId));
+        shoppingCartRepository.save(cart);
     }
 
     @Override

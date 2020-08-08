@@ -1,17 +1,18 @@
 package edu.miu.eshop.product.dto;
 
+import edu.miu.eshop.product.entity.CartItem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDto {
+public class ShoppingCartDto {
 
-    private String categoryId;
-    private String parentId;
-    private String value;
+    private String cartId;
+    private String userName;
+    private CartItem cartItem;
 }
