@@ -3,9 +3,9 @@ package edu.miu.eshop.eurekaservice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+//import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
-@EnableZuulProxy
+//@EnableZuulProxy
 @EnableEurekaServer
 @SpringBootApplication
 public class EurekaServiceApplication {

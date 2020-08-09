@@ -4,8 +4,6 @@ import edu.miu.eshop.product.dto.CartItemDto;
 import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.dto.ShoppingCartDto;
 import edu.miu.eshop.product.entity.*;
-import edu.miu.eshop.product.repository.CustomerRepository;
-import edu.miu.eshop.product.service.OrderService;
 import edu.miu.eshop.product.service.ProductService;
 import edu.miu.eshop.product.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.ws.rs.Path;
-import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -25,11 +21,7 @@ public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
     @Autowired
-    private OrderService orderService;
-    @Autowired
     private ProductService productService;
-    @Autowired
-    private CustomerRepository customerRepository;
     @Autowired
     private RestTemplate restTemplate;
 
@@ -52,10 +44,11 @@ public class ShoppingCartController {
     public ResponseEntity addCartItem(@RequestBody CartItemDto cartItemDto){
         ShoppingCart cart = shoppingCartService.findCartForUser(cartItemDto.getUserName());
         ProductDto product  = productService.getProduct(cartItemDto.getProductId());
-        boolean exists = cart.getCartItems().stream().anyMatch(i->i.getProductId().equals(cartItemDto.getProductId()));
 
         if(product==null)  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
-        if(cart!=null){
+        boolean exists = cart.getCartItems().stream().anyMatch(i->i.getProductId().equals(cartItemDto.getProductId()));
+
+        if(cart!=null&&product!=null){
 
                     shoppingCartService.addCartItem(product, cart, cartItemDto.getQuantity());
         }else{
@@ -96,7 +89,7 @@ public class ShoppingCartController {
         shoppingCartService.removeItem(cart,shoppingCartDto.getCartItem().getProductId());
         return  ResponseEntity
                     .status(HttpStatus.OK)
-                    .body("Item deleted");
+                    .body(cart.getCartItems());
     }
 
     //READ
@@ -108,7 +101,7 @@ public class ShoppingCartController {
                 .status(HttpStatus.NOT_FOUND)
                 .body("Cart is empty");
         return  ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.OK)
                 .body(cart.getCartItems());
     }
 }

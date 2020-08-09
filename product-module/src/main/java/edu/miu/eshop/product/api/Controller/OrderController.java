@@ -69,6 +69,8 @@ public class OrderController {
 
             CALL PAYMENT MODULE
              */
+
+      //  total cost and
              //PaymentModule(order.getUserName(), id, paymentCard);
 
             //save purchase history

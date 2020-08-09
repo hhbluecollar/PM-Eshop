@@ -7,9 +7,11 @@ public interface CategoryService {
 
     void save(Category category);
 
-    void addCategory(String parentId, String value, String categoryId);
+    void addCategory(String parentId, String value);
 
-    void deleteCategory(String parentId,  String CategoryId);
+    void deleteCategory(  String CategoryId);
 
-    void editCategory(String parentId, String value,String categoryId);
+    void editCategory( String value,String categoryId);
+
+    Object getAll();
 }

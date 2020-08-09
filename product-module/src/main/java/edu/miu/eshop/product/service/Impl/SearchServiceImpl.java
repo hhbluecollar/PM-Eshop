@@ -24,12 +24,12 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public ArrayList<Product> findByAll(String productName, String productCategory, String manufacturer, Double minProductPrice, Double maxProductPrice) {
-        return  searchRepository.findByProductNameMatchesAndProductCategoryAndManufacturerAndPriceBetween( productName,  productCategory,  manufacturer,  minProductPrice,  maxProductPrice);
+        return  searchRepository.findByProductNameMatchesAndCategoryNameAndManufacturerAndPriceBetween( productName,  productCategory,  manufacturer,  minProductPrice,  maxProductPrice);
     }
 
     @Override
     public ArrayList<Product> findByNameCategoryPrice(String productName, String productCategory, Double minProductPrice, Double maxProductPrice) {
-        return  searchRepository.findByProductNameMatchesAndProductCategoryAndPriceBetween(productName, productCategory, minProductPrice, maxProductPrice);
+        return  searchRepository.findByProductNameMatchesAndCategoryNameAndPriceBetween(productName, productCategory, minProductPrice, maxProductPrice);
     }
 
     @Override
@@ -40,13 +40,13 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public ArrayList<Product> findByNameCategoryManufacturer(String productName, String productCategory, String manufacturer) {
-        return  searchRepository.findByProductNameMatchesAndProductCategoryAndManufacturer(productName, productCategory, manufacturer);
+        return  searchRepository.findByProductNameMatchesAndCategoryNameAndManufacturer(productName, productCategory, manufacturer);
 
     }
 
     @Override
     public ArrayList<Product> findByNameCategory(String productName, String productCategory) {
-        return searchRepository.findByProductNameMatchesAndProductCategory( productName,  productCategory);
+        return searchRepository.findByProductNameMatchesAndCategoryName( productName,  productCategory);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public ArrayList<Product> findByCategory(String productCategory) {
-        return searchRepository.findByProductCategory(productCategory);
+        return searchRepository.findByCategoryName(productCategory);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
    public ArrayList<Product> findByGeneric(String productName, String productCategory, String manufacturer, Double minProductPrice, Double maxProductPrice){
-        return searchRepository.findByProductNameMatchesOrProductCategoryOrManufacturerOrPriceBetween(productName, productCategory, manufacturer, minProductPrice, maxProductPrice);
+        return searchRepository.findByProductNameMatchesOrCategoryNameOrManufacturerOrPriceBetween(productName, productCategory, manufacturer, minProductPrice, maxProductPrice);
     }
 
     @Override

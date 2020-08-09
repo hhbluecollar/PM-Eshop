@@ -16,38 +16,46 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    @GetMapping("")
+    public ResponseEntity getCategories(){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(categoryService.getAll());
+    }
+
     @PostMapping("/create")
     public ResponseEntity saveCategory(@RequestBody Category category){
         categoryService.save(category);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body("Category Created");
+                .body(categoryService.getAll());
     }
 
     @PostMapping("/add")
     public ResponseEntity addCategory(@RequestBody CategoryDto categoryDto){
 
-        categoryService.addCategory(categoryDto.getParentId(), categoryDto.getValue(), categoryDto.getCategoryId());
+        categoryService.addCategory(categoryDto.getParentId(), categoryDto.getValue());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("Category Added");
+                .body(categoryService.getAll());
     }
 
-    @PostMapping("/edit")
+    @PutMapping("/edit")
     public ResponseEntity editCategory(@RequestBody CategoryDto categoryDto){
 
-        categoryService.editCategory(categoryDto.getParentId(), categoryDto.getValue(),categoryDto.getCategoryId());
+        categoryService.editCategory( categoryDto.getValue(),categoryDto.getCategoryId());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("Category edited");
+                .body(categoryService.getAll());
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity deleteCategory(@RequestBody CategoryDto categoryDto){
 
-        categoryService.deleteCategory(categoryDto.getParentId(), categoryDto.getCategoryId());
+        categoryService.deleteCategory( categoryDto.getCategoryId());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("Category deleted");
+                .body(categoryService.getAll());
     }
+
 }

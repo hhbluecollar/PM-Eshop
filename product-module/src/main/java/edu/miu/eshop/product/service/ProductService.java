@@ -5,6 +5,7 @@ import edu.miu.eshop.product.constants.ProductStatus;
 import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.entity.Product;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface ProductService {
@@ -20,7 +21,7 @@ public interface ProductService {
 
     List<ProductDto> getProductsOnPromotion();
 
-    void updateStatus(String id, ProductStatus newStatus);
+    Product updateStatus(String id, ProductStatus newStatus);
 
-    void updateProduct(ProductDto productDto);
+    Product updateProduct(ProductDto productDto, String productid) throws ParseException;
 }

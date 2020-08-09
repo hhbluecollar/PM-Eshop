@@ -28,8 +28,8 @@ public class Product {
     private  int currentQuantity;
     private ArrayList<ProductDetail> productDetails = new ArrayList<>();
     private String vendorId;
-    @DBRef
-    private Category productCategory;
+    private String  categoryName;
+    private String  categoryId;
     private List<ProductImage> imageList;
     private ProductStatus status ;
 

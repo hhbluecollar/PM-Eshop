@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
@@ -23,26 +25,30 @@ public class CategoryServiceImpl implements CategoryService {
    }
 
    @Override
-   public void addCategory(String parentId, String value, String categoryId) {
+   public void addCategory(String parentId, String value) {
 
       Category category = categoryRepository.findById(parentId).get();
-      category.addCategory(parentId, value, categoryId);
+      category.addCategory(parentId, value);
       categoryRepository.save(category);
    }
 
    @Override
-   public void editCategory(String parentId, String value, String CategoryId) {
+   public void editCategory( String value, String CategoryId) {
 
-      Category category = categoryRepository.findById(parentId).get();
+      Category category = categoryRepository.findByCategoryName("Root");
       category.editCategory(CategoryId, value);
       categoryRepository.save(category);
 
    }
 
    @Override
-   public void deleteCategory(String parentId, String categoryId) { // this is the category id in the dto used inplace of paretntId
-       Category category = categoryRepository.findById(parentId).get();
-      System.out.println(categoryId);
+   public List<Category> getAll() {
+      return categoryRepository.findAll();
+   }
+
+   @Override
+   public void deleteCategory( String categoryId) { // this is the category id in the dto used inplace of paretntId
+       Category category = categoryRepository.findByCategoryName("Root");
        category.deleteCategory(categoryId);
        categoryRepository.save(category);
    }

@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>edu.miu.eshop.product</groupId>
-	<artifactId>eshop-shoppingcart</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>eshop-product</artifactId>
+	<version>0.0.1</version>
 	<name>eshop-product</name>
 	<description>Product Microservice for Online Shopping Application</description>
 	<properties>
@@ -48,7 +48,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -76,7 +75,6 @@
 			<artifactId>modelmapper</artifactId>
 			<version>2.3.8</version>
 		</dependency>
-
 	</dependencies>
 
 	<dependencyManagement>
