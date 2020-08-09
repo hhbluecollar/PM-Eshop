@@ -24,7 +24,6 @@ public class Category {
      * We should ask category status ??? ADDED USER ID add
      */
     @Id
-    @Generated
     @JsonProperty("key")
     private String id;
     @JsonProperty("label")
@@ -38,19 +37,16 @@ public class Category {
 
     public Category addCategory(String parentId, String value){
         if(this.id.equals(parentId)) {
-
-                Category c = new Category(value);
-                c.setId(generateCategoryId());
-            if(!this.subCategories.contains(c)){
-                this.subCategories.add(c);
-            }
+            Category c = new Category(value);
+            c.setId(generateCategoryId());
+            this.subCategories.add(c);
             return c;
         }
 
-        for(Category c : subCategories){
-            if(!this.subCategories.contains(c)){
-                c.addCategory(parentId, value);
-            }
+        for(Category c : this.subCategories){
+            Category category = c.addCategory(parentId, value);
+                if(category!=null)
+                    return category;
         }
         return null;
     }

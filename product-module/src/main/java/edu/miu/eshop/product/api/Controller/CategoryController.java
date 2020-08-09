@@ -49,10 +49,10 @@ public class CategoryController {
                 .body(categoryService.getAll());
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity deleteCategory(@RequestBody CategoryDto categoryDto){
+    @DeleteMapping("/delete/{categoryid}")
+    public ResponseEntity deleteCategory(@PathVariable String categoryid){
 
-        categoryService.deleteCategory( categoryDto.getCategoryId());
+        categoryService.deleteCategory( categoryid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(categoryService.getAll());
