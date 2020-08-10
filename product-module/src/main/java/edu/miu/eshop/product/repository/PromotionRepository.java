@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface PromotionRepository extends MongoRepository<Promotion, String> {
     List<Promotion> findByProductId(String productId);
+
+    List<Promotion> findByVendorId(String vendorid);
 }

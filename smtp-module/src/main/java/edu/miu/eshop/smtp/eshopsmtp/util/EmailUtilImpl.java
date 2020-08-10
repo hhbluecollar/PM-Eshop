@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.util.List;
 
 @Component
 public class EmailUtilImpl implements  EmailUtil{
@@ -17,7 +18,7 @@ public class EmailUtilImpl implements  EmailUtil{
     private JavaMailSender sender;
 
     @Override
-    public void sendEmail(String [] toAddress, String subject, String body, File [] attachments){
+    public void sendEmail(String [] toAddress, String subject, String body, List<File> attachments){
 
         MimeMessage mimeMessage = sender.createMimeMessage();
         try {

@@ -27,7 +27,7 @@ public class ProductController {
     public ResponseEntity  saveProduct(@RequestBody Product product){
         productService.save(product);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(product);
     }
 
@@ -82,6 +82,17 @@ public class ProductController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(product.getStatus().ordinal());
+    }
+
+    @DeleteMapping("/delete/{productid}")
+    public ResponseEntity deleteProduct(@PathVariable String productid) {
+
+        ProductDto deletedProduct  = productService.getProduct(productid);
+        productService.deleteProduct(  productid);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body( deletedProduct);
     }
 
     @PutMapping("/update/{productid}")

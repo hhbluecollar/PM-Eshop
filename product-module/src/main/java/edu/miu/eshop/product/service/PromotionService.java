@@ -14,4 +14,6 @@ public interface PromotionService {
     public void update(String promotionid, Promotion promotion);
 
     void save(Promotion promotion);
+
+    List<Promotion> getByVendor(String vendorid);
 }

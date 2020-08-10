@@ -128,6 +128,11 @@ public class ProductServiceImpl implements ProductService {
          return  product;
     }
 
+    @Override
+    public void deleteProduct(String productid) {
+         productRepository.deleteById(productid);
+    }
+
     /**
      *TO DO
      */

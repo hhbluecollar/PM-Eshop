@@ -30,7 +30,7 @@ public class Product {
     private String vendorId;
     private String  categoryName;
     private String  categoryId;
-    private List<ProductImage> imageList;
+    private List<String> imageList;
     private ProductStatus status ;
 
     public void addProductDetail( String specName, String specValue, String specType) {

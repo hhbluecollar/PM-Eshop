@@ -53,4 +53,12 @@ public class PromotionController {
                 .status(HttpStatus.OK)
                 .body( promotionService.get(promotionid));
     }
+
+    @GetMapping("vendor/{vendorid}")
+    public ResponseEntity getByVendor(@PathVariable String vendorid){
+
+        return  ResponseEntity
+                .status(HttpStatus.OK)
+                .body( promotionService.getByVendor(vendorid));
+    }
 }

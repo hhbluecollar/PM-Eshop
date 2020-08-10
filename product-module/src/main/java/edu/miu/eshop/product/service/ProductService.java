@@ -24,4 +24,6 @@ public interface ProductService {
     Product updateStatus(String id, ProductStatus newStatus);
 
     Product updateProduct(ProductDto productDto, String productid) throws ParseException;
+
+    void deleteProduct(String productid);
 }

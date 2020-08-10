@@ -48,4 +48,9 @@ public class PromotionServiceImpl implements PromotionService {
     public void save(Promotion promotion) {
         promotionRepository.save(promotion);
     }
+
+    @Override
+    public List<Promotion> getByVendor(String vendorid) {
+        return promotionRepository.findByVendorId(vendorid);
+    }
 }

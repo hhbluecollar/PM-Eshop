@@ -16,6 +16,7 @@ public class Promotion {
     @Id
     private  String id;
     private  String productId;
+    private String vendorId;
     private  String promoName;
     private String PromotionDescription;
     private  long promotionPercentage;
