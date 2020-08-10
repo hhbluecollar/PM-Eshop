@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@RequestMapping("email")
+@RequestMapping("emails")
 @RestController
 public class EmailController {
 
@@ -30,10 +30,9 @@ public class EmailController {
         String attachmentPaths [] = email.getAttachmentsPath();
         List<File> attachments = new ArrayList<>();
 
-        if(attachmentPaths.length!=0 || attachmentPaths!=null){
+        if(attachmentPaths!=null){
 
             for (String s: attachmentPaths){
-                System.out.println(s);
                 attachments.add(new File(s));
             }
         }
