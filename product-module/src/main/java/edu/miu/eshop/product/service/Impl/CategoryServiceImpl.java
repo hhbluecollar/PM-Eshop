@@ -27,7 +27,8 @@ public class CategoryServiceImpl implements CategoryService {
    @Override
    public void addCategory(String parentId, String value) {
 
-      Category root = categoryRepository.findByCategoryName("Root");
+      Category root = categoryRepository.findByCategoryName("AllProducts");
+      System.out.println(root);
 //      List<Category> root = categoryRepository.findByCategoryName("Root");
      // Category category = root.addCategory(parentId, value);
      // System.out.println(category);

@@ -1,4 +1,4 @@
-package edu.miu.eshop.product.api.client;
+package edu.miu.eshop.product.entity;
 
 import lombok.*;
 

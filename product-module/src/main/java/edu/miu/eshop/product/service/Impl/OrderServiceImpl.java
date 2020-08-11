@@ -1,21 +1,19 @@
 package edu.miu.eshop.product.service.Impl;
 
 import edu.miu.eshop.product.constants.TaxRate;
-import edu.miu.eshop.product.entity.Promotion;
-import edu.miu.eshop.product.repository.CustomerRepository;
+import edu.miu.eshop.product.dto.CustomerDto;
+import edu.miu.eshop.product.dto.TransactionDto;
+import edu.miu.eshop.product.entity.*;
 import edu.miu.eshop.product.repository.OrderRepository;
 import edu.miu.eshop.product.repository.ProductRepository;
 import edu.miu.eshop.product.repository.PromotionRepository;
 import edu.miu.eshop.product.service.OrderService;
-import edu.miu.eshop.product.entity.Product;
-import edu.miu.eshop.product.entity.Order;
-import edu.miu.eshop.product.entity.OrderItem;
-import edu.miu.eshop.product.entity.CartItem;
-import edu.miu.eshop.product.entity.Customer;
-import edu.miu.eshop.product.entity.ShoppingCart;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +32,26 @@ public class OrderServiceImpl implements OrderService {
 
     private  double promotion;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${url.email.service}")
+    private String URI_EMAIL_SERVICE ;
+    @Value("${path.email.sent}")
+    private String  PATH_EMAIL_SEND ;
+
+    @Value("${url.user.service}")
+    private String URI_USER_SERVICE ;
+    @Value("${path.user.id}")
+    private String  PATH_USER_GET ;
+
+    @Value("${url.payment.service}")
+    private String URI_PAYMENT_SERVICE;
+    @Value("${url.payment.pay}")
+    private String PATH_PAYMENT_PAY;
+
+    @Value("${admin.token}")
+    private String  token ;
     public void createOrder(ShoppingCart cart, String userName) {
         System.out.println(cart);
         cart.getCartItems().forEach(
@@ -50,14 +68,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void createGuestOrder(List<OrderItem> orderItems) {
+    public void createGuestOrder(List<CartItem> orderItems, String email) {
         orderItems.forEach(
                 cartItem -> {
                     Order order = new Order();
-                   // double totalCost = calculateCost(cartItem);
-                    //order.setTotalCost(totalCost);
+                    double totalCost = calculateCost(cartItem);
+                    order.setTotalCost(totalCost);
                     order.setOrderDate(LocalDateTime.now());
-                 //   order.setOrderedBy(customer);
+                    order.setUserName(email);
                     order.setOrderNumber(generateOrderNumber());
                     orderRepository.save(order);
                 }
@@ -83,6 +101,55 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrder(String orderNumber) {
         orderRepository.deleteByOrderNumber(orderNumber);
+    }
+
+    @Override
+    public void checkout(String orderNumber, Card paymentCard) {
+        //FIND ALL PENDING ORDERS FOR THE CUSTOMER
+        Order order = getOrder(orderNumber);
+        String customerId = order.getCustomerId();
+        //String vendorId = order.getVendorId
+
+        // CALL PAYMENT MODULE
+        RestTemplate rPay = new RestTemplate();
+        HttpHeaders headersPay = new HttpHeaders();
+        headersPay.setContentType(MediaType.APPLICATION_JSON);
+
+        String urlPay =  URI_PAYMENT_SERVICE +  PATH_PAYMENT_PAY;
+        HttpEntity paymentEntity = new HttpEntity(new TransactionDto(paymentCard, order.getTotalCost()), headersPay);
+        System.out.println(urlPay);
+        ResponseEntity<Boolean> paymentOk =   rPay.exchange(urlPay,
+                HttpMethod.POST,
+                paymentEntity,
+                Boolean.class);
+
+        // CONNECT TO CUSTOMER MODULE
+        RestTemplate rCus = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        HttpEntity<String> customerEntity = new HttpEntity<>(headers);
+        String urlCustomer =  URI_USER_SERVICE +  PATH_USER_GET;
+        CustomerDto customerDto =   rCus.exchange(urlCustomer + "/" +customerId,
+                HttpMethod.GET,
+                customerEntity,
+                CustomerDto.class).getBody();
+
+        //SEND EMAIL TO CUSTOMER
+        RestTemplate rVen = new RestTemplate();
+        headers.set("Authorization", "Bearer " + token);
+        HttpEntity<String> vendorEntity = new HttpEntity<>(headers);
+//        String urlVendor =  URI_VENDOR_SERVICE +  PATH_VENDOR_GET;
+//        VendorDto vendorDto =   rCus.exchange(urlVendor + "/" +vendorId,
+//                HttpMethod.GET,
+//                customerEntity,
+//                VendorDto.class).getBody();
+//        sendEmailToVendor(vendorDto, order);
+
+        // SEND EMAIL TO VENDOR
+        sendEmailToCustomer(customerDto, order);
+        //STORE ORDER DETAIL
+        sendEmailToVendor(order);
+
     }
 
     private double calculateCost(CartItem item) {
@@ -125,6 +192,45 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return sb.toString();
+    }
+
+    private HttpEntity prepareEmail( String [] receivers,  String subject, String body, String [] attachmentsPath){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Email email = new Email();
+        email.setReceivers(receivers);
+        email.setSubject(subject);
+        email.setBody(body);
+        email.setAttachmentsPath(attachmentsPath);
+        HttpEntity<?> entity = new HttpEntity<>(email,headers);
+        return  entity;
+    }
+
+    private void sendEmailToCustomer(CustomerDto customerDto, Order order){
+        String[] recipientsCustomer = {customerDto.getUsername()};
+        String customerSubject = "Your Order From eshop";
+        String [] attachmentsPath = {"src/main/resources/attachments/testAttachment.txt"};
+        String messageCustomer = "Congratulations! Your order successfully completed /n" +
+                "Order Number:" + order.getOrderNumber() + " /n" +
+                "Total price: " + order.getTotalCost() + " /n" +
+                "Date: " + order.getOrderDate() + " /n"  ;
+
+        HttpEntity<?> cusEmailEntity = prepareEmail(recipientsCustomer,customerSubject,messageCustomer,attachmentsPath);
+        restTemplate.postForObject(URI_EMAIL_SERVICE + PATH_EMAIL_SEND,  cusEmailEntity, String.class);
+    }
+
+    private  void  sendEmailToVendor(Order order){ // VENDOR EMAIL INCLUDE
+        String [] recipientsVendor = {"springmukera@gmail.com"};
+        String vendorSubject = "Your Order From eshop";
+        String [] VendorAttachmentsPath = {"src/main/resources/attachments/testAttachment.txt"};
+        String messageVendor = "New order! New order is placed /n" +
+                "Order Number:" + order.getOrderNumber() + " /n" +
+                "Total price: " + order.getTotalCost() + " /n" +
+                "Date: " + order.getOrderDate() + " /n" ;
+
+        HttpEntity<?> venEmailEntity = prepareEmail(recipientsVendor,vendorSubject,messageVendor,VendorAttachmentsPath);
+        restTemplate.postForObject(URI_EMAIL_SERVICE + PATH_EMAIL_SEND,  venEmailEntity, String.class);
     }
 }
 

@@ -2,10 +2,7 @@ package edu.miu.eshop.product.dto;
 
 import edu.miu.eshop.product.constants.ProductStatus;
 import edu.miu.eshop.product.entity.ProductDetail;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +11,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+
 public class ProductDto {
 
     private String productId;

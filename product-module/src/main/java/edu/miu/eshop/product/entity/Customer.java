@@ -1,64 +1,54 @@
 package edu.miu.eshop.product.entity;
 
+import edu.miu.eshop.product.constants.CustomerStatus;
+import edu.miu.eshop.product.constants.Role;
+import edu.miu.eshop.product.dto.AddressDto;
+import edu.miu.eshop.product.dto.BankCardDto;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
-@NoArgsConstructor
-@ToString
-@Setter
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Set;
+
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-@Document
-@EqualsAndHashCode
+@ToString
 public class Customer {
-
     @Id
-    private  String id;
-    @Indexed(unique=true) // make it unique username
-    @NotEmpty
+    private String id;
+    @Indexed(unique=true)
+    private String customerId;
+    @Indexed(unique=true)
     private String userName;
+    private String password;
     private String firstName;
     private String lastName;
-    @Email
-    private String email;
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdDate;
     private String phone;
-    private ShoppingCart cart;
+    private Set<BankCardDto> cards;
+    private CustomerStatus status = CustomerStatus.ACTIVE;
+    private Role role = Role.ROLE_CUSTOMER;
+    private String imageUrl;
+    private double totalScore = 0.0;
+    private AddressDto billingAddress;
+    private AddressDto shippingAddress;
 
-    private Address billingAddress;
-    private Address shippingAddress;
-
-    // one-to--(zero or many) unidirectional
-    private List<PaymentCard> paymentCards = new ArrayList<>();
-
-    public PaymentCard addPaymentCard(long cardNumber, String cvv, String cardHolder, LocalDate expirationDate,boolean cardStatus){
-      PaymentCard pCard = new PaymentCard(cardNumber, cvv, cardHolder, expirationDate,cardStatus);
-      paymentCards.add(pCard);
-      return pCard;
+    public void addScore(double score){
+        this.totalScore += score;
+    }
+    public void addCard(BankCardDto newCard){
+        this.cards.add(newCard);
     }
 
-    // one-to-(zero or many) unidirectional
-//    private List<Order> orders = new ArrayList<>();
-//    public void addOrder(String orderNumber, LocalDate orderDate, Address shippingAddress, Address billingAddress, List<CartItem> cartItems) {
-//        Order order = new Order(orderNumber,  orderDate,  shippingAddress,  billingAddress,  cartItems, this);
-//        orders.add(order);
-//    }
-
-    public Customer(String userName, String firstName, String lastName, String email, String phone, Address billingAddress, Address shippingAddress) {
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phone = phone;
-        this.billingAddress = billingAddress;
-        this.shippingAddress = shippingAddress;
+    public void deleteCard(BankCardDto bankCardDto) {
+        this.cards.remove(bankCardDto);
     }
 }

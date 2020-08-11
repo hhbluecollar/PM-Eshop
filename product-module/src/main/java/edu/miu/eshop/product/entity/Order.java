@@ -30,6 +30,7 @@ public class Order {
     private double totalCost;
     private List<CartItem> cartItem; // use design pattern
     private String userName;
+    private String customerId;
 
     /**
      *  USE DESIGN PATTERN TO INITIALIZE FIELDS

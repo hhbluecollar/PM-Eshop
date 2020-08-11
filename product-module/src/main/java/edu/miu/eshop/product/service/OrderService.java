@@ -1,15 +1,12 @@
 package edu.miu.eshop.product.service;
 
-import edu.miu.eshop.product.entity.Order;
-import edu.miu.eshop.product.entity.OrderItem;
-import edu.miu.eshop.product.entity.Customer;
-import edu.miu.eshop.product.entity.ShoppingCart;
+import edu.miu.eshop.product.entity.*;
 
 import java.util.List;
 
 public interface OrderService {
     void createOrder(ShoppingCart cart, String userName);
-    void createGuestOrder(List<OrderItem> items);
+    void createGuestOrder(List<CartItem> items, String email);
 
     Order getOrder(String orderNumber);
 
@@ -18,4 +15,6 @@ public interface OrderService {
     void updateOrder(Order oldOrder);
 
     void deleteOrder(String orderNumber);
+
+    void checkout(String orderNumber, Card paymentCard);
 }

@@ -20,9 +20,6 @@ import java.util.ListIterator;
 @AllArgsConstructor
 public class Category {
 
-    /**
-     * We should ask category status ??? ADDED USER ID add
-     */
     @Id
     @JsonProperty("key")
     private String id;

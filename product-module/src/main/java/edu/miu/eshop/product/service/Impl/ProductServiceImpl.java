@@ -148,14 +148,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = modelMapper.map(productDto, Product.class);
         System.out.println(product);
             Product oldProduct = productRepository.findByProductId(productid);
-            product.setProductName(oldProduct.getProductName());
-            product.setDescription(oldProduct.getDescription());
-            product.setCurrentQuantity(oldProduct.getCurrentQuantity());
-            product.setProductDetails(oldProduct.getProductDetails());
-            product.setVendorId(oldProduct.getVendorId());
-            product.setCategoryId(oldProduct.getCategoryId());
-            product.setCategoryName(oldProduct.getCategoryName());
-            product.setImageList(oldProduct.getImageList());
             product.setProductId(oldProduct.getProductId());
 
         return product;
