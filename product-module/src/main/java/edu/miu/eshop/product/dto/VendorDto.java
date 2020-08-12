@@ -1,9 +1,10 @@
 package edu.miu.eshop.product.dto;
 
 import edu.miu.eshop.product.constants.CustomerStatus;
-import edu.miu.eshop.product.entity.Customer;
+import edu.miu.eshop.product.constants.Role;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
@@ -11,20 +12,17 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-
 public class VendorDto {
-
-        private String vendorName;
-        private String description;
-        private String contactMethod;
-        private Set<BankCardDto> cards;
-
-        public void addCard(BankCardDto newCard){
-            this.cards.add(newCard);
-        }
-
-        public void deleteCard(BankCardDto bankCardDto) {
-            this.cards.remove(bankCardDto);
-
-    }
+    private String vendorId;
+    private String username;
+    private String vendorName;
+    private String phone;
+    private Set<BankCardDto> cards;
+    private CustomerStatus status;
+    private Role role;
+    private String imageUrl;
+    private AddressDto address;
+    private LocalDate createdDate;
+    private String description;
+    private String contactMethod;
 }

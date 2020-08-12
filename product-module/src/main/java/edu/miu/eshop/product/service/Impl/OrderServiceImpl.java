@@ -2,7 +2,9 @@ package edu.miu.eshop.product.service.Impl;
 
 import edu.miu.eshop.product.constants.TaxRate;
 import edu.miu.eshop.product.dto.CustomerDto;
+import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.dto.TransactionDto;
+import edu.miu.eshop.product.dto.VendorDto;
 import edu.miu.eshop.product.entity.*;
 import edu.miu.eshop.product.repository.OrderRepository;
 import edu.miu.eshop.product.repository.ProductRepository;
@@ -18,6 +20,8 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static edu.miu.eshop.product.constants.TaxRate.TAX_RATE;
 
 @Service
 @Transactional
@@ -43,43 +47,56 @@ public class OrderServiceImpl implements OrderService {
     @Value("${url.user.service}")
     private String URI_USER_SERVICE ;
     @Value("${path.user.id}")
-    private String  PATH_USER_GET ;
+    private String  PATH_USER_GET;
 
     @Value("${url.payment.service}")
     private String URI_PAYMENT_SERVICE;
     @Value("${url.payment.pay}")
     private String PATH_PAYMENT_PAY;
 
+    @Value("${url.vendor.service}")
+    private String URI_VENDOR_SERVICE;
+    @Value("${url.vendor.pay}")
+    private String PATH_VENDOR_EMAIL;
+
     @Value("${admin.token}")
     private String  token ;
+
+
     public void createOrder(ShoppingCart cart, String userName) {
-        System.out.println(cart);
+        Order order = new Order();
+        double totalCost = calculateCost(cart);
+        order.setTotalCost(totalCost);
+        order.setOrderDate(LocalDateTime.now());
+        order.setUserName(userName);
+        order.setOrderNumber(generateOrderNumber());
+
         cart.getCartItems().forEach(
                 cartItem -> {
-                    Order order = new Order();
-                    double totalCost = calculateCost(cartItem);
-                    order.setTotalCost(totalCost);
-                    order.setOrderDate(LocalDateTime.now());
-                    order.setUserName(userName);
-                    order.setOrderNumber(generateOrderNumber());
-                    orderRepository.save(order);
+                    order.addOrderItem(cartItem);
                 }
         );
+        orderRepository.save(order);
+
     }
 
     @Override
     public void createGuestOrder(List<CartItem> orderItems, String email) {
+        ShoppingCart guestCart = new ShoppingCart();
+        guestCart.setCartItems(orderItems);
+        Order order = new Order();
+        double totalCost = calculateCost(guestCart);
+        order.setTotalCost(totalCost);
+        order.setOrderDate(LocalDateTime.now());
+        order.setOrderNumber(generateOrderNumber());
+        order.setUserName(email);
+
         orderItems.forEach(
-                cartItem -> {
-                    Order order = new Order();
-                    double totalCost = calculateCost(cartItem);
-                    order.setTotalCost(totalCost);
-                    order.setOrderDate(LocalDateTime.now());
-                    order.setUserName(email);
-                    order.setOrderNumber(generateOrderNumber());
-                    orderRepository.save(order);
+                cartItem -> {    order.addOrderItem(cartItem);
                 }
         );
+        orderRepository.save(order);
+
     }
 
     @Override
@@ -88,8 +105,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllOrders(String userName) {
-        return orderRepository.findAllByUserName (userName);
+    public List<Order> getAllOrders(String customerId) {
+        return orderRepository.findAllByCustomerId( customerId);
     }
 
 
@@ -108,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
         //FIND ALL PENDING ORDERS FOR THE CUSTOMER
         Order order = getOrder(orderNumber);
         String customerId = order.getCustomerId();
-        //String vendorId = order.getVendorId
+        //String vendorId = order.getVendorId();
 
         // CALL PAYMENT MODULE
         RestTemplate rPay = new RestTemplate();
@@ -134,42 +151,50 @@ public class OrderServiceImpl implements OrderService {
                 customerEntity,
                 CustomerDto.class).getBody();
 
-        //SEND EMAIL TO CUSTOMER
+        // SEND EMAIL TO VENDOR
+        sendEmailToCustomer(customerDto, order);
+
+        //RETRIEVE EACH VENDOR AND  SEND EMAIL
         RestTemplate rVen = new RestTemplate();
         headers.set("Authorization", "Bearer " + token);
         HttpEntity<String> vendorEntity = new HttpEntity<>(headers);
-//        String urlVendor =  URI_VENDOR_SERVICE +  PATH_VENDOR_GET;
-//        VendorDto vendorDto =   rCus.exchange(urlVendor + "/" +vendorId,
-//                HttpMethod.GET,
-//                customerEntity,
-//                VendorDto.class).getBody();
-//        sendEmailToVendor(vendorDto, order);
 
-        // SEND EMAIL TO VENDOR
-        sendEmailToCustomer(customerDto, order);
+        order.getOrderItems().stream().forEach( orderItem -> {
+            String urlVendor =  URI_VENDOR_SERVICE +  PATH_VENDOR_EMAIL;
+            String  vendorEmail =   rVen.exchange(urlVendor + "/" + orderItem.getVendorId(),
+            HttpMethod.GET,
+                    vendorEntity,
+                    String.class).getBody();
+                    System.out.println(urlVendor);
+            sendEmailToVendor(vendorEmail, order);
+        }
+        );
+
         //STORE ORDER DETAIL
-        sendEmailToVendor(order);
 
     }
 
-    private double calculateCost(CartItem item) {
-
-        Product product = productRepository.findByProductId(item.getProductId());
+    private double calculateCost(ShoppingCart cart) {
+        int totalCost = 0;
+        for (CartItem item : cart.getCartItems()){
+            Product product = productRepository.findByProductId(item.getProductId());
         List<Promotion> promotions = promotionRepository.findByProductId(item.getProductId());
-        if(promotions.size()>0){
+        if (promotions.size() > 0) {
 
-                    promotions.stream()
-                            .map(pro->pro.getPromotionPercentage())
-                            .forEach(
-                                    p -> {
-                                        if ( p > 0) {
-                                            promotion +=  item.getUnitCost() * p;
-                                        }
-                                    }
-                            );
-                }
+            promotions.stream()
+                    .map(pro -> pro.getPromotionPercentage())
+                    .forEach(
+                            p -> {
+                                if (p > 0) {
+                                    promotion += item.getUnitCost() * p;
+                                }
+                            }
+                    );
+        }
+            totalCost+= item.getQuantity()*(item.getUnitCost()-promotion);
 
-        return item.getQuantity()*(item.getUnitCost()-promotion)* TaxRate.TAX_RATE.getStateTax();
+        }
+        return  totalCost + totalCost*TAX_RATE.getStateTax();
     }
 
     //generate order number of length 15
@@ -220,8 +245,8 @@ public class OrderServiceImpl implements OrderService {
         restTemplate.postForObject(URI_EMAIL_SERVICE + PATH_EMAIL_SEND,  cusEmailEntity, String.class);
     }
 
-    private  void  sendEmailToVendor(Order order){ // VENDOR EMAIL INCLUDE
-        String [] recipientsVendor = {"springmukera@gmail.com"};
+    private  void  sendEmailToVendor(String vendorEmail, Order order){
+        String [] recipientsVendor = {vendorEmail};
         String vendorSubject = "Your Order From eshop";
         String [] VendorAttachmentsPath = {"src/main/resources/attachments/testAttachment.txt"};
         String messageVendor = "New order! New order is placed /n" +

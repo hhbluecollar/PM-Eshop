@@ -10,7 +10,7 @@ public interface OrderService {
 
     Order getOrder(String orderNumber);
 
-    List<Order> getAllOrders(String userName);
+    List<Order> getAllOrders(String customerId);
 
     void updateOrder(Order oldOrder);
 

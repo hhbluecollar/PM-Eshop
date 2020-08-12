@@ -15,8 +15,8 @@ import java.util.List;
 
 public class ProductDto {
 
-    private String productId;
     private String productName;
+    private String productId;
     private double price;
     private String description;
 

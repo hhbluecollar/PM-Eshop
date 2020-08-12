@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -19,6 +20,7 @@ import java.util.List;
 @Setter
 @Getter
 @Document
+
 public class Order {
 
     @Id
@@ -31,14 +33,13 @@ public class Order {
     private List<CartItem> cartItem; // use design pattern
     private String userName;
     private String customerId;
+    private  List<CartItem> orderItems = new ArrayList<>();
 
-    /**
-     *  USE DESIGN PATTERN TO INITIALIZE FIELDS
-     * @param orderNumber
-     * @param orderDate
-     * @param cartItem
-     * @param orderedBy
-     */
+
+    public void addOrderItem(CartItem cartItem){
+        orderItems.add(cartItem);
+    }
+
     public Order(String orderNumber, LocalDateTime orderDate, List<CartItem> cartItem, String orderedBy) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;

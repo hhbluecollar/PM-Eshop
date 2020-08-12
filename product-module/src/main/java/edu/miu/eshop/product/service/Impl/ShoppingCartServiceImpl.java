@@ -51,13 +51,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                                         .forEach(i->{
                                                               i.setQuantity(i.getQuantity()+quantity);  });
         }else
-            cart.addItem(product.getProductId(), product.getProductName(), product.getPrice(), quantity);
+            cart.addItem(product.getProductId(), quantity, product.getPrice(), product.getVendorId());
         shoppingCartRepository.save(cart);
     }
 
     @Override
     public void setProductQuantity(ShoppingCart cart, String productId, int updatedQuantity) {
-        System.out.println(cart);
         cart.getCartItems().stream().filter(i->i.getProductId().equals(productId))
                                     .forEach(i->i.setQuantity(updatedQuantity));
         shoppingCartRepository.save(cart);

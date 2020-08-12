@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../eshop-admin/eshop-admin.iml" filepath="$PROJECT_DIR$/../../eshop-admin/eshop-admin.iml" />
       <module fileurl="file://$PROJECT_DIR$/eshop-product.iml" filepath="$PROJECT_DIR$/eshop-product.iml" />
       <module fileurl="file://$PROJECT_DIR$/../smtp-module/eshop-smtp.iml" filepath="$PROJECT_DIR$/../smtp-module/eshop-smtp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../eshopuser/eshop-user.iml" filepath="$PROJECT_DIR$/../../eshopuser/eshop-user.iml" />
       <module fileurl="file://$PROJECT_DIR$/../eureka-service/eureka-service.iml" filepath="$PROJECT_DIR$/../eureka-service/eureka-service.iml" />
     </modules>
   </component>

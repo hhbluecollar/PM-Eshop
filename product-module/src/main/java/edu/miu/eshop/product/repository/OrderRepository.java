@@ -14,5 +14,5 @@ public interface OrderRepository extends MongoRepository<Order, String>  {
 
     void deleteByOrderNumber(String orderNumber);
 
-    List<Order> findAllByUserName(String userName);
+    List<Order> findAllByCustomerId(String customerId);
 }

@@ -1,6 +1,5 @@
 package edu.miu.eshop.product.api.Controller;
 
-import edu.miu.eshop.product.constants.ProductStatus;
 import edu.miu.eshop.product.dto.ProductDto;
 import edu.miu.eshop.product.dto.StatusDto;
 import edu.miu.eshop.product.entity.Product;

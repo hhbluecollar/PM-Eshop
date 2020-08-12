@@ -29,8 +29,8 @@ public class ShoppingCart {
         this.userName = userName;
         cartItems = new ArrayList<>();
     }
-    public void addItem( String productId, String name, double unitCost, int quantity) {
-        CartItem item = new CartItem( productId,  name, unitCost, quantity);
+    public void addItem( String productId, int  quantity, double unitCost, String vendorId) {
+        CartItem item = new CartItem( productId,   quantity, unitCost, vendorId, userName);
         cartItems.add(item);
     }
 }

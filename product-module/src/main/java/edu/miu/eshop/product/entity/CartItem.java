@@ -7,18 +7,13 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @ToString
+
 public class CartItem {
 
     private String productId;
-    private String productName ;
     private int quantity;
     private double unitCost;
+    private String vendorId;
+    private String userName;
 
-    public CartItem(String productId, String name, double unitCost, int quantity ) {
-
-        this.productId = productId;
-        this.productName = name;
-        this.quantity = quantity;
-        this.unitCost = unitCost;
-    }
 }

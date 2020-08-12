@@ -1,20 +1,15 @@
 package edu.miu.eshop.product.api.Controller;
 
-import edu.miu.eshop.product.dto.CustomerDto;
 import edu.miu.eshop.product.dto.GuestCustomerDto;
-import edu.miu.eshop.product.dto.TransactionDto;
+import edu.miu.eshop.product.dto.UserNameDto;
 import edu.miu.eshop.product.entity.*;
 import edu.miu.eshop.product.service.OrderService;
 import edu.miu.eshop.product.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.List;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/orders")
@@ -27,26 +22,27 @@ public class OrderController {
 
 
     // ORDER CREATE
-    @GetMapping("create/{userName}")
-    public ResponseEntity createOrder(@PathVariable String userName){
-        ShoppingCart cart = shoppingCartService.findCartForUser(userName);
+    @PostMapping("/create")
+    public ResponseEntity createOrder(@RequestBody UserNameDto userNameDto){
+        ShoppingCart cart = shoppingCartService.findCartForUser(userNameDto.getUserName());
+        System.out.println(cart);
         if(cart==null )  {
             return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body("The user has no order");
         }
-        orderService.createOrder(cart, userName);
+        orderService.createOrder(cart, userNameDto.getUserName());
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body("Order created");
     }
 
     //READ
-    @GetMapping("/{userName}")
-    public ResponseEntity getAllOrders(@PathVariable String userName){
+    @GetMapping("/{customerId}")
+    public ResponseEntity getAllOrders(@PathVariable String customerId){
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body( orderService.getAllOrders(userName));
+                .status(HttpStatus.OK)
+                .body( orderService.getAllOrders(customerId));
     }
 
     @GetMapping("order/{orderNumber}")

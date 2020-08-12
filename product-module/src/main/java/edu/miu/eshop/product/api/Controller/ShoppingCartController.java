@@ -44,10 +44,8 @@ public class ShoppingCartController {
     public ResponseEntity addCartItem(@RequestBody CartItemDto cartItemDto){
         ShoppingCart cart = shoppingCartService.findCartForUser(cartItemDto.getUserName());
         ProductDto product  = productService.getProduct(cartItemDto.getProductId());
-
         if(product==null)  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
-        boolean exists = cart.getCartItems().stream().anyMatch(i->i.getProductId().equals(cartItemDto.getProductId()));
-
+        //boolean exists = cart.getCartItems().stream().anyMatch(i->i.getProductId().equals(cartItemDto.getProductId()));
         if(cart!=null&&product!=null){
 
                     shoppingCartService.addCartItem(product, cart, cartItemDto.getQuantity());
