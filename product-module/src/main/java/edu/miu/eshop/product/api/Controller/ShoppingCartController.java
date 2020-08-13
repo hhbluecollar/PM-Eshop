@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -26,14 +28,20 @@ public class ShoppingCartController {
     private RestTemplate restTemplate;
 
     @PostMapping("/create")
-    public ResponseEntity  createCart(@RequestBody CartItemDto cartItemDto){
-        if(shoppingCartService.findCartForUser(cartItemDto.getUserName())!=null){
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body("Cart already created");
-        }
-        shoppingCartService.createNewCart(cartItemDto.getUserName());
+    public ResponseEntity  createCart(@RequestBody List<CartItemDto> cartItemDtos){
 
+        String user = cartItemDtos.get(0).getUserName();
+
+        //CREATE THE CART
+        ShoppingCart cart = shoppingCartService.createNewCart(user);
+
+        //ADD TO THE CART
+        for (CartItemDto cartItemDto:cartItemDtos) {
+
+            ProductDto product = productService.getProduct(cartItemDto.getProductId());
+            if (product == null) ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            shoppingCartService.addCartItem(product, cart, cartItemDto.getQuantity());
+        }
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Cart created");

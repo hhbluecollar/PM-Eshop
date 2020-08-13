@@ -27,9 +27,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
 
     @Override
-    public void createNewCart(String userName) {
+    public ShoppingCart createNewCart(String userName) {
         ShoppingCart cart = new ShoppingCart(userName);
+
         shoppingCartRepository.save(cart);
+        return  cart;
     }
 
     @Override

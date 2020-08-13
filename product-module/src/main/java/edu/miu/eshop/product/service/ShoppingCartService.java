@@ -21,7 +21,7 @@ public interface ShoppingCartService {
 
     void setProductQuantity(ShoppingCart cart, String productId, int updatedQuantity);
 
-    void createNewCart(String userName );
+    ShoppingCart createNewCart(String userName );
 
     ShoppingCart findCartForUser(String userName);
 
