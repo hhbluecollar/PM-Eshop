@@ -73,7 +73,7 @@ public class OrderController {
         oldOrder.setUserName(newOrder.getUserName());
         oldOrder.setOrderDate(newOrder.getOrderDate());
         oldOrder.setTotalCost(newOrder.getTotalCost());
-        oldOrder.setCartItem(newOrder.getCartItem());
+        oldOrder.setOrderItems(newOrder.getOrderItems());
         orderService.updateOrder(oldOrder);
 
         return ResponseEntity

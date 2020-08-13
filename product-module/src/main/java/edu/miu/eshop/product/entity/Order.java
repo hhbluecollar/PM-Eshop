@@ -30,7 +30,6 @@ public class Order {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime orderDate;
     private double totalCost;
-    private List<CartItem> cartItem; // use design pattern
     private String userName;
     private String customerId;
     private  List<CartItem> orderItems = new ArrayList<>();
@@ -43,7 +42,7 @@ public class Order {
     public Order(String orderNumber, LocalDateTime orderDate, List<CartItem> cartItem, String orderedBy) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
-        this.cartItem = cartItem;
+        this.orderItems = cartItem;
         this.userName = orderedBy;
     }
 }

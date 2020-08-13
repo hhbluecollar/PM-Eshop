@@ -1,6 +1,5 @@
 package edu.miu.eshop.product.dto;
 
-import edu.miu.eshop.product.entity.Card;
 import lombok.*;
 
 @Getter
@@ -8,8 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TransactionDto {
+public class EmailDto {
+    private String vendorId;
+    private String email;
 
-    private Card card;
-    private double cost;
 }

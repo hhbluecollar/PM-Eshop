@@ -1,10 +1,7 @@
 package edu.miu.eshop.product.service.Impl;
 
 import edu.miu.eshop.product.constants.TaxRate;
-import edu.miu.eshop.product.dto.CustomerDto;
-import edu.miu.eshop.product.dto.ProductDto;
-import edu.miu.eshop.product.dto.TransactionDto;
-import edu.miu.eshop.product.dto.VendorDto;
+import edu.miu.eshop.product.dto.*;
 import edu.miu.eshop.product.entity.*;
 import edu.miu.eshop.product.repository.OrderRepository;
 import edu.miu.eshop.product.repository.ProductRepository;
@@ -125,19 +122,17 @@ public class OrderServiceImpl implements OrderService {
         //FIND ALL PENDING ORDERS FOR THE CUSTOMER
         Order order = getOrder(orderNumber);
         String customerId = order.getCustomerId();
-
         // CALL PAYMENT MODULE
         RestTemplate rPay = new RestTemplate();
         HttpHeaders headersPay = new HttpHeaders();
         headersPay.setContentType(MediaType.APPLICATION_JSON);
         TransactionDto transactional = new TransactionDto(paymentCard, order.getTotalCost());
-        System.out.println(transactional);
         String urlPay =  URI_PAYMENT_SERVICE +  PATH_PAYMENT_PAY;
         HttpEntity paymentEntity = new HttpEntity(transactional, headersPay);
-        Boolean paymentOk =   rPay.exchange(urlPay,
+        BooleanDto paymentOk =   rPay.exchange(urlPay,
                 HttpMethod.POST,
                 paymentEntity,
-                Boolean.class).getBody();
+                BooleanDto.class).getBody();
 
         // CONNECT TO CUSTOMER MODULE
         RestTemplate rCus = new RestTemplate();
@@ -155,17 +150,19 @@ public class OrderServiceImpl implements OrderService {
 
         //RETRIEVE EACH VENDOR AND  SEND EMAIL
         RestTemplate rVen = new RestTemplate();
-        headers.set("Authorization", "Bearer " + token);
-        HttpEntity<String> vendorEntity = new HttpEntity<>(headers);
+        HttpHeaders headersVendor = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> vendorEntity = new HttpEntity<>(headersVendor);
 
         order.getOrderItems().stream().forEach( orderItem -> {
             String urlVendor =  URI_VENDOR_SERVICE +  PATH_VENDOR_EMAIL;
-            String  vendorEmail =   rVen.exchange(urlVendor + "/" + orderItem.getVendorId(),
+
+            EmailDto  emailDto =   rVen.exchange(urlVendor + "/" + orderItem.getVendorId(),
             HttpMethod.GET,
                     vendorEntity,
-                    String.class).getBody();
-                    System.out.println(urlVendor);
-            sendEmailToVendor(vendorEmail, order);
+                    EmailDto.class).getBody();
+            sendEmailToVendor(emailDto.getEmail(), order);
         }
         );
 
@@ -245,6 +242,7 @@ public class OrderServiceImpl implements OrderService {
 
     private  void  sendEmailToVendor(String vendorEmail, Order order){
         String [] recipientsVendor = {vendorEmail};
+        System.out.println("sendEmailToVendor : "+recipientsVendor[0]);
         String vendorSubject = "Your Order From eshop";
         String [] VendorAttachmentsPath = {"src/main/resources/attachments/testAttachment.txt"};
         String messageVendor = "New order! New order is placed /n" +
@@ -252,6 +250,7 @@ public class OrderServiceImpl implements OrderService {
                 "Total price: " + order.getTotalCost() + " /n" +
                 "Date: " + order.getOrderDate() + " /n" ;
 
+        System.out.println("The path is :"+ URI_EMAIL_SERVICE + PATH_EMAIL_SEND);
         HttpEntity<?> venEmailEntity = prepareEmail(recipientsVendor,vendorSubject,messageVendor,VendorAttachmentsPath);
         restTemplate.postForObject(URI_EMAIL_SERVICE + PATH_EMAIL_SEND,  venEmailEntity, String.class);
     }
