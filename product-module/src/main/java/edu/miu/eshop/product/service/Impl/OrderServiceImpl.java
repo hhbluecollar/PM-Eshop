@@ -125,20 +125,19 @@ public class OrderServiceImpl implements OrderService {
         //FIND ALL PENDING ORDERS FOR THE CUSTOMER
         Order order = getOrder(orderNumber);
         String customerId = order.getCustomerId();
-        //String vendorId = order.getVendorId();
 
         // CALL PAYMENT MODULE
         RestTemplate rPay = new RestTemplate();
         HttpHeaders headersPay = new HttpHeaders();
         headersPay.setContentType(MediaType.APPLICATION_JSON);
-
+        TransactionDto transactional = new TransactionDto(paymentCard, order.getTotalCost());
+        System.out.println(transactional);
         String urlPay =  URI_PAYMENT_SERVICE +  PATH_PAYMENT_PAY;
-        HttpEntity paymentEntity = new HttpEntity(new TransactionDto(paymentCard, order.getTotalCost()), headersPay);
-        System.out.println(urlPay);
-        ResponseEntity<Boolean> paymentOk =   rPay.exchange(urlPay,
+        HttpEntity paymentEntity = new HttpEntity(transactional, headersPay);
+        Boolean paymentOk =   rPay.exchange(urlPay,
                 HttpMethod.POST,
                 paymentEntity,
-                Boolean.class);
+                Boolean.class).getBody();
 
         // CONNECT TO CUSTOMER MODULE
         RestTemplate rCus = new RestTemplate();
@@ -171,7 +170,6 @@ public class OrderServiceImpl implements OrderService {
         );
 
         //STORE ORDER DETAIL
-
     }
 
     private double calculateCost(ShoppingCart cart) {
