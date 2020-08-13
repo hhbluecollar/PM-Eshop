@@ -28,19 +28,20 @@ public class ShoppingCartController {
     private RestTemplate restTemplate;
 
     @PostMapping("/create")
-    public ResponseEntity  createCart(@RequestBody List<CartItemDto> cartItemDtos){
+    public ResponseEntity  createCart(@RequestBody ShoppingCart shoppingCart){
 
-        String user = cartItemDtos.get(0).getUserName();
+        String user = shoppingCart.getUserName();
 
         //CREATE THE CART
         ShoppingCart cart = shoppingCartService.createNewCart(user);
 
         //ADD TO THE CART
-        for (CartItemDto cartItemDto:cartItemDtos) {
+        for (CartItem item:shoppingCart.getCartItems()) {
 
-            ProductDto product = productService.getProduct(cartItemDto.getProductId());
+            ProductDto product = productService.getProduct(item.getProductId());
+
             if (product == null) ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
-            shoppingCartService.addCartItem(product, cart, cartItemDto.getQuantity());
+            shoppingCartService.addCartItem(product, cart, item.getQuantity());
         }
         return ResponseEntity
                 .status(HttpStatus.CREATED)
