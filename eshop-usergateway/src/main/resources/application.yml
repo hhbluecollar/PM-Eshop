@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: user-gateway
+
+server:
+  port: 8080
+
+zuul:
+  ignoreSecurityHeaders: false
+  ignoredServices: '*'
+  sensitiveHeaders: Cookie,Set-Cookie
+  #Service will be mapped under the /api URI
+  prefixLogin: /login
+  routes:
+    signup:
+      path: /signup
+      service-id: user-service
+      strip-prefix: false
+    login:
+      path: /login
+      service-id: user-service
+      strip-prefix: false
+    user:
+      path: /users/**
+      service-id: user-service
+      strip-prefix: false
+  # Product Module
+    product:
+      path: /products/**
+      service-id: product-service
+      strip-prefix: false
+    order:
+      path: /orders/**
+      service-id: product-service
+      strip-prefix: false
+    promotion:
+      path: /promotions/**
+      service-id: product-service
+      strip-prefix: false
+    category:
+      path: /categories/**
+      service-id: product-service
+      strip-prefix: false
+    search:
+      path: /search/**
+      service-id: product-service
+      strip-prefix: false
+    shoppingcart:
+      path: /cart/**
+      service-id: product-service
+      strip-prefix: false

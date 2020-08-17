@@ -6,7 +6,9 @@ import edu.miu.eshop.product.entity.*;
 import edu.miu.eshop.product.repository.OrderRepository;
 import edu.miu.eshop.product.repository.ProductRepository;
 import edu.miu.eshop.product.repository.PromotionRepository;
+import edu.miu.eshop.product.repository.ShoppingCartRepository;
 import edu.miu.eshop.product.service.OrderService;
+import edu.miu.eshop.product.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -30,6 +32,8 @@ public class OrderServiceImpl implements OrderService {
     private ProductRepository productRepository;
     @Autowired
     private PromotionRepository promotionRepository;
+    @Autowired
+    private ShoppingCartRepository  shoppingCartRepository;
 
     private  double promotion;
 
@@ -58,11 +62,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${admin.token}")
     private String  token ;
+    private String paymentSuccess;
+    private double totalCost;
 
-
-    public void createOrder(ShoppingCart cart, String userName) {
+    public Order createOrder(ShoppingCart cart, String userName) {
         Order order = new Order();
-        double totalCost = calculateCost(cart);
         order.setTotalCost(totalCost);
         order.setOrderDate(LocalDateTime.now());
         order.setUserName(userName);
@@ -73,12 +77,11 @@ public class OrderServiceImpl implements OrderService {
                     order.addOrderItem(cartItem);
                 }
         );
-        orderRepository.save(order);
-
+       return  orderRepository.save(order);
     }
 
     @Override
-    public void createGuestOrder(List<CartItem> orderItems, String email) {
+    public Order createGuestOrder(List<CartItem> orderItems, String email) {
         ShoppingCart guestCart = new ShoppingCart();
         guestCart.setCartItems(orderItems);
         Order order = new Order();
@@ -92,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
                 cartItem -> {    order.addOrderItem(cartItem);
                 }
         );
-        orderRepository.save(order);
+       return orderRepository.save(order);
 
     }
 
@@ -118,21 +121,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void checkout(String orderNumber, Card paymentCard) {
-        //FIND ALL PENDING ORDERS FOR THE CUSTOMER
-        Order order = getOrder(orderNumber);
-        String customerId = order.getCustomerId();
-        // CALL PAYMENT MODULE
+    public void checkout(String cartNumber, Card paymentCard) {
+        ShoppingCart cart = shoppingCartRepository.findById(cartNumber).get();
+        totalCost = this.calculateCost(cart);
+         String customerId = cart.getCustomerId();
+
+         // CALL PAYMENT MODULE
         RestTemplate rPay = new RestTemplate();
         HttpHeaders headersPay = new HttpHeaders();
         headersPay.setContentType(MediaType.APPLICATION_JSON);
-        TransactionDto transactional = new TransactionDto(paymentCard, order.getTotalCost());
+        TransactionDto transactional = new TransactionDto(paymentCard, totalCost);
         String urlPay =  URI_PAYMENT_SERVICE +  PATH_PAYMENT_PAY;
         HttpEntity paymentEntity = new HttpEntity(transactional, headersPay);
         BooleanDto paymentOk =   rPay.exchange(urlPay,
                 HttpMethod.POST,
                 paymentEntity,
                 BooleanDto.class).getBody();
+
+         paymentSuccess = paymentOk.isBool()?"Successful":"Failed";
+
+         System.out.println(paymentSuccess);
+
+         //IF PAYMENT OK GENERATE ORDER
+        if(paymentOk.isBool())
+            return;
+             Order order = createOrder(cart, cart.getUserName());
 
         // CONNECT TO CUSTOMER MODULE
         RestTemplate rCus = new RestTemplate();
@@ -165,8 +178,6 @@ public class OrderServiceImpl implements OrderService {
             sendEmailToVendor(emailDto.getEmail(), order);
         }
         );
-
-        //STORE ORDER DETAIL
     }
 
     private double calculateCost(ShoppingCart cart) {
@@ -234,7 +245,8 @@ public class OrderServiceImpl implements OrderService {
         String messageCustomer = "Congratulations! Your order successfully completed /n" +
                 "Order Number:" + order.getOrderNumber() + " /n" +
                 "Total price: " + order.getTotalCost() + " /n" +
-                "Date: " + order.getOrderDate() + " /n"  ;
+                "Date: " + order.getOrderDate() + " /n"  +
+                "Your payment was: " + paymentSuccess;
 
         HttpEntity<?> cusEmailEntity = prepareEmail(recipientsCustomer,customerSubject,messageCustomer,attachmentsPath);
         restTemplate.postForObject(URI_EMAIL_SERVICE + PATH_EMAIL_SEND,  cusEmailEntity, String.class);

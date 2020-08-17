@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="eshop-visabank" />
+        <module name="eshop-mastercardbank" />
+        <module name="eshop-discoverybank" />
+        <module name="eshop-amexbank" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="eshop-amexbank" target="1.8" />
+      <module name="eshop-bankapi" target="1.8" />
+      <module name="eshop-discoverybank" target="1.8" />
+      <module name="eshop-mastercardbank" target="1.8" />
+      <module name="eshop-visabank" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="eshop-amexbank" options="-parameters" />
+      <module name="eshop-bankapi" options="-parameters" />
+      <module name="eshop-discoverybank" options="-parameters" />
+      <module name="eshop-mastercardbank" options="-parameters" />
+      <module name="eshop-visabank" options="-parameters" />
+    </option>
+  </component>
+</project>

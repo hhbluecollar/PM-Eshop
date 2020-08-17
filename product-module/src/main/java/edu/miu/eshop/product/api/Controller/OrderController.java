@@ -50,11 +50,10 @@ public class OrderController {
     }
 
     //CHECKOUT and CONFIRM PAYMENT
-    @PostMapping("/checkout/{orderNumber}")
-    public ResponseEntity checkout(@PathVariable("orderNumber") String orderNumber, @RequestBody Card paymentCard){
+    @PostMapping("/checkout/{cartNumber}")
+    public ResponseEntity checkout(@PathVariable("cartNumber") String cartNumber, @RequestBody Card paymentCard){
 
-        orderService.checkout(orderNumber, paymentCard);
-
+        orderService.checkout(cartNumber, paymentCard);
         return ResponseEntity.ok().body("Order checkout is successfully.");
     }
 

@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: admin-gateway
+
+server:
+  port: 8090
+
+zuul:
+  ignoreSecurityHeaders: false
+  ignoredServices: '*'
+  sensitiveHeaders: Cookie,Set-Cookie
+  #Service will be mapped under the /api URI
+  prefixLogin: /login
+  routes:
+    signup:
+      path: /signup
+      service-id: admin-service
+      strip-prefix: false
+    login:
+      path: /login
+      service-id: admin-service
+      strip-prefix: false
+    employee:
+      path: /employees/**
+      service-id: admin-service
+      strip-prefix: false
+    vendor:
+      path: /vendors/**
+      service-id: admin-service
+      strip-prefix: false
+    user:
+      path: /users/**
+      service-id: admin-service
+      strip-prefix: false
+    requirement:
+      path: /requirements/**
+      service-id: admin-service
+      strip-prefix: false
+    category:
+      path: /categories/**
+      service-id: admin-service
+      strip-prefix: false
+    product:
+      path: /products/**
+      service-id: admin-service
+      strip-prefix: false
+    promotion:
+      path: /promotions/**
+      service-id: admin-service
+      strip-prefix: false
+  # Product Module
+    products:
+      path: /products/**
+      service-id: admin-service
+      strip-prefix: false
+    orders:
+      path: /orders/**
+      service-id: admin-service
+      strip-prefix: false
+    promotions:
+      path: /promotions/**
+      service-id: admin-service
+      strip-prefix: false
+  # Payment Module
+    payment:
+      path: /card/**
+      service-id: payment-service
+      strip-prefix: false

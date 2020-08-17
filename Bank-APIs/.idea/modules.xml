@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Bank-APIs.iml" filepath="$PROJECT_DIR$/.idea/Bank-APIs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eshop-amexbank/eshop-amexbank.iml" filepath="$PROJECT_DIR$/eshop-amexbank/eshop-amexbank.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eshop-discovery/eshop-discoverybank.iml" filepath="$PROJECT_DIR$/eshop-discovery/eshop-discoverybank.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eshop-mastercard/eshop-mastercardbank.iml" filepath="$PROJECT_DIR$/eshop-mastercard/eshop-mastercardbank.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eshop-visabank/eshop-visabank.iml" filepath="$PROJECT_DIR$/eshop-visabank/eshop-visabank.iml" />
+    </modules>
+  </component>
+</project>

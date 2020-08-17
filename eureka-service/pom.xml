@@ -12,6 +12,7 @@
     <artifactId>eureka-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>eureka-service</name>
+    <packaging>war</packaging>
     <description>Eureka Service Discovery Server</description>
 
     <properties>
@@ -30,15 +31,14 @@
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-zuul -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-zuul</artifactId>
-            <version>1.4.7.RELEASE</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

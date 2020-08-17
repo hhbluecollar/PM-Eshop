@@ -25,7 +25,6 @@ public class Customer {
     private String id;
     @Indexed(unique=true)
     private String customerId;
-    @Indexed(unique=true)
     private String userName;
     private String password;
     private String firstName;

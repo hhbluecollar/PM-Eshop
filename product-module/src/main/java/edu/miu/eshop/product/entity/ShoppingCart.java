@@ -22,7 +22,7 @@ public class ShoppingCart {
     private String id;
     // OneToMany --- the one side owns the relationship
     private List<CartItem> cartItems = new ArrayList<>( );
-    @Indexed(unique = true)
+    private String customerId;
     private String userName;
 
     public ShoppingCart(String userName){

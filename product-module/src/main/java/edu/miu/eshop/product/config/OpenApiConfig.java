@@ -17,11 +17,10 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         var servers = new ArrayList<Server>();
-        servers.add(new Server().url("http://localhost:8102").description("Development server"));
+        servers.add(new Server().url("http://localhost:8080").description("Development server"));
 
         return new OpenAPI().components(new Components()).info(new Info()
                 .description("<p>This is PI documentation for Shopping Cart microservice.</p>")
                 .title("Shopping Cart Microservice Module of eshop").version("1.0.0")).servers(servers);
     }
-
 }

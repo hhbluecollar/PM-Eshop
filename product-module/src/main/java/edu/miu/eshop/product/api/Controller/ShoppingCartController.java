@@ -28,7 +28,7 @@ public class ShoppingCartController {
     private RestTemplate restTemplate;
 
     @PostMapping("/create")
-    public ResponseEntity  createCart(@RequestBody ShoppingCart shoppingCart){
+    public ResponseEntity  createCart(@RequestBody  ShoppingCart shoppingCart){
 
         String user = shoppingCart.getUserName();
 
