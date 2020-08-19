@@ -1,6 +1,7 @@
 package edu.miu.eshop.product.config;
 
 
+import io.swagger.v3.oas.annotations.servers.Servers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -16,7 +18,7 @@ public class OpenApiConfig {
     // springdoc config
     @Bean
     public OpenAPI customOpenAPI() {
-        var servers = new ArrayList<Server>();
+        List<Server> servers = new ArrayList<>();
         servers.add(new Server().url("http://localhost:8080").description("Development server"));
 
         return new OpenAPI().components(new Components()).info(new Info()

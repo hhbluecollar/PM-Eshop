@@ -18,7 +18,7 @@
     <bytecodeTargetLevel>
       <module name="eshop-admin" target="11" />
       <module name="eshop-bankapi" target="1.8" />
-      <module name="eshop-product" target="11" />
+      <module name="eshop-product" target="1.8" />
       <module name="eshop-smtp" target="11" />
       <module name="eshop-user" target="11" />
       <module name="eureka-service" target="11" />

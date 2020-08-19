@@ -14,18 +14,11 @@
 	<name>eshop-product</name>
 	<description>Product Microservice for Online Shopping Application</description>
 	<properties>
-		<java.version>11</java.version>
-<!--		<spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>-->
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
 	</properties>
 	<packaging>war</packaging>
-	<configuration>
-		<appender name = "FILE" class = "ch.qos.logback.core.FileAppender">
-			<File>/var/tmp/mylog.log</File>
-		</appender>
-		<root level = "INFO">
-			<appender-ref ref = "FILE"/>
-		</root>
-	</configuration>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
